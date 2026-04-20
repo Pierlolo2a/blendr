@@ -167,9 +167,16 @@
   function renderRoom() {
     if (!roomData) return;
 
-    const isHost = roomData.hostId === mySocketId;
+    // Détection robuste de l'hôte : on cherche NOTRE entrée dans la liste
+    // et on vérifie son flag isHost (plus fiable que comparer hostId === mySocketId
+    // car socket.id peut changer après reconnexion)
+    const currentSocketId = socket?.id || mySocketId;
     const players = roomData.players || [];
+    const myPlayer = players.find((p) => p.id === currentSocketId);
+    const isHost = myPlayer?.isHost === true || roomData.hostId === currentSocketId;
     const settings = roomData.settings || {};
+
+    console.log('[renderRoom] isHost:', isHost, 'myId:', currentSocketId, 'hostId:', roomData.hostId, 'myPlayer:', myPlayer);
 
     // Compteur de joueurs
     document.getElementById('player-count').textContent = players.length;

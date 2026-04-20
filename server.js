@@ -522,18 +522,39 @@ io.on('connection', (socket) => {
       }
     }
 
+    // Si le host actuel n'existe plus dans les joueurs, transfere a ce joueur
+    // (cas ou le host est parti et personne n'a pris le relai)
+    if (!room.players.has(room.hostId) && oldSocketId !== socket.id) {
+      room.hostId = socket.id;
+      wasHost = true;
+    }
+
+    // Si la room est vide (seul joueur qui rejoint), il devient hote
+    if (room.players.size === 0) {
+      room.hostId = socket.id;
+      wasHost = true;
+    }
+
+    const willBeHost = wasHost || room.hostId === socket.id;
     room.players.set(socket.id, {
       id: socket.id,
       pseudo: cleanPseudo,
       avatar,
-      isHost: wasHost || room.hostId === socket.id,
+      isHost: willBeHost,
       ready: false,
       connected: true,
     });
 
+    // Force la coherence : si ce joueur est host, mettre a jour hostId
+    if (willBeHost) {
+      room.hostId = socket.id;
+    }
+
     socket.join(code);
     socket.data.roomCode = code;
     touchRoom(room);
+
+    log.info(`[room] rejoin ${code} par ${cleanPseudo} - isHost: ${willBeHost}, hostId: ${room.hostId}`);
 
     ack?.({ ok: true, code, room: serializeRoom(room) });
     io.to(code).emit('room:update', serializeRoom(room));
