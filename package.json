@@ -1,0 +1,31 @@
+{
+  "name": "blendr",
+  "version": "0.1.0",
+  "description": "Blendr - Draw. Guess. Lose the plot. Un jeu web multijoueur en temps réel inspiré du téléphone arabe.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "watch": "node --watch server.js"
+  },
+  "keywords": [
+    "game",
+    "multiplayer",
+    "drawing",
+    "telephone",
+    "socket.io"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.3.2",
+    "helmet": "^8.1.0",
+    "socket.io": "^4.7.5",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

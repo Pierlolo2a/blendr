@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lobby — Blendr</title>
+    <link rel="icon" type="image/jpeg" href="/assets/img/logo.jpg" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/animations.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+    <style>
+      .lobby {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 32px 20px;
+        min-height: 100vh;
+      }
+      .lobby__header {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+      .lobby__title {
+        font-size: clamp(1.5rem, 4vw, 2rem);
+        margin: 0 0 8px;
+      }
+      .lobby__code {
+        font-family: 'Menlo', 'Consolas', monospace;
+        font-size: clamp(2rem, 6vw, 3.2rem);
+        font-weight: 800;
+        letter-spacing: 0.3em;
+        color: var(--color-primary);
+        margin: 12px 0 16px;
+      }
+      .lobby__share {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+      .lobby__main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 32px;
+      }
+      .lobby__panel {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+      }
+      .lobby__panel-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 16px;
+      }
+      .lobby__players {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .player-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: var(--color-bg-soft);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--color-border);
+      }
+      .player-card__avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: var(--color-bg);
+      }
+      .player-card__info {
+        flex: 1;
+        min-width: 0;
+      }
+      .player-card__pseudo {
+        font-weight: 600;
+        margin: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .player-card__badge {
+        display: inline-block;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        background: var(--color-primary);
+        color: #fff;
+        font-weight: 600;
+        margin-left: 6px;
+      }
+      .player-card__ready {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--color-text-muted);
+      }
+      .player-card__ready--yes {
+        background: var(--color-success);
+      }
+      .lobby__chat {
+        display: flex;
+        flex-direction: column;
+        height: 380px;
+      }
+      .lobby__messages {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .chat-msg {
+        font-size: 14px;
+        line-height: 1.4;
+      }
+      .chat-msg--system {
+        color: var(--color-text-muted);
+        font-style: italic;
+        text-align: center;
+      }
+      .chat-msg__author {
+        font-weight: 600;
+        color: var(--color-text);
+      }
+      .chat-msg__text {
+        color: var(--color-text-soft);
+      }
+      .lobby__chat-input {
+        display: flex;
+        gap: 8px;
+      }
+      .lobby__chat-input input {
+        flex: 1;
+      }
+      .lobby__settings {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .setting {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .setting__label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--color-text-soft);
+      }
+      .setting__options {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .setting__option {
+        flex: 1;
+        min-width: 80px;
+        padding: 10px 14px;
+        border-radius: var(--radius-md);
+        background: var(--color-bg-soft);
+        border: 2px solid var(--color-border);
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+      }
+      .setting__option:hover {
+        background: var(--color-surface-hover);
+      }
+      .setting__option--selected {
+        border-color: var(--color-primary);
+        background: rgba(108, 99, 255, 0.15);
+        color: var(--color-primary);
+      }
+      .lobby__actions {
+        text-align: center;
+      }
+      @media (max-width: 768px) {
+        .lobby__main {
+          grid-template-columns: 1fr;
+        }
+        .lobby__chat {
+          height: 280px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="lobby">
+      <header class="lobby__header">
+        <h1 class="lobby__title">Salle d'attente</h1>
+        <div class="lobby__code" id="room-code">—</div>
+        <div class="lobby__share">
+          <button type="button" class="btn btn--ghost" id="btn-copy-code">
+            📋 Copier le code
+          </button>
+          <button type="button" class="btn btn--ghost" id="btn-copy-link">
+            🔗 Copier le lien
+          </button>
+        </div>
+      </header>
+
+      <div class="lobby__main">
+        <div class="lobby__panel">
+          <h2 class="lobby__panel-title">
+            Joueurs (<span id="player-count">0</span>/12)
+          </h2>
+          <div class="lobby__players" id="players-list"></div>
+        </div>
+
+        <div class="lobby__panel">
+          <h2 class="lobby__panel-title">Chat</h2>
+          <div class="lobby__chat">
+            <div class="lobby__messages" id="chat-messages"></div>
+            <div class="lobby__chat-input">
+              <input
+                type="text"
+                class="field__input"
+                id="chat-input"
+                placeholder="Écris un message..."
+                maxlength="200"
+                autocomplete="off"
+              />
+              <button type="button" class="btn btn--primary" id="btn-send">
+                Envoyer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lobby__panel" id="settings-panel" style="display: none">
+        <h2 class="lobby__panel-title">Configuration (Host uniquement)</h2>
+        <div class="lobby__settings" id="settings-form"></div>
+      </div>
+
+      <div class="lobby__actions">
+        <button
+          type="button"
+          class="btn btn--primary"
+          id="btn-start"
+          disabled
+          style="min-width: 200px"
+        >
+          Lancer la partie
+        </button>
+        <p style="margin-top: 12px; color: var(--color-text-muted); font-size: 14px" id="start-hint">
+          Minimum 3 joueurs pour lancer
+        </p>
+      </div>
+    </main>
+
+    <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/sounds.js"></script>
+    <script src="/js/avatars.js"></script>
+    <script src="/js/lobby.js"></script>
+  </body>
+</html>

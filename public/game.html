@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Partie en cours — Blendr</title>
+    <link rel="icon" type="image/jpeg" href="/assets/img/logo.jpg" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/animations.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+    <style>
+      .game {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        min-height: 100vh;
+      }
+      
+      /* Timer */
+      .game__timer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: var(--color-bg-elev);
+        border-bottom: 1px solid var(--color-border);
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .timer__label {
+        font-weight: 700;
+        font-size: 18px;
+        min-width: 80px;
+      }
+      .timer__bar {
+        flex: 1;
+        height: 12px;
+        background: var(--color-surface);
+        border-radius: 999px;
+        overflow: hidden;
+        position: relative;
+      }
+      .timer__fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+        border-radius: 999px;
+        transition: width 0.3s linear, background 0.3s;
+        width: 100%;
+      }
+      .timer__fill--warning {
+        background: linear-gradient(90deg, var(--color-secondary), var(--color-danger));
+        animation: timer-pulse 0.5s ease-in-out infinite;
+      }
+      .timer__count {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--color-text-soft);
+      }
+      @keyframes timer-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+      }
+
+      /* Content */
+      .game__content {
+        margin-top: 80px;
+        padding: 20px;
+      }
+
+      .game__screen {
+        display: none;
+      }
+      .game__screen--active {
+        display: block;
+      }
+
+      /* Tour d'écriture */
+      .write-screen {
+        max-width: 700px;
+        margin: 0 auto;
+        text-align: center;
+      }
+      .write-screen__prompt {
+        font-size: clamp(1.25rem, 3vw, 1.75rem);
+        margin-bottom: 32px;
+        color: var(--color-text-soft);
+      }
+      .write-screen__context {
+        margin-bottom: 32px;
+      }
+      .write-screen__image {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: var(--radius-lg);
+        margin: 0 auto 24px;
+        box-shadow: var(--shadow-md);
+      }
+      .write-screen__input {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto 16px;
+      }
+      .write-screen__input textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 16px;
+        font-size: 16px;
+        resize: vertical;
+        background: var(--color-bg-soft);
+        border: 2px solid var(--color-border);
+        border-radius: var(--radius-md);
+        color: var(--color-text);
+        font-family: inherit;
+      }
+      .write-screen__input textarea:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: var(--shadow-glow-primary);
+      }
+      .write-screen__counter {
+        text-align: right;
+        font-size: 13px;
+        color: var(--color-text-muted);
+        margin-bottom: 24px;
+      }
+
+      /* Canvas de dessin */
+      .draw-screen {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .draw-screen__prompt {
+        text-align: center;
+        font-size: clamp(1.25rem, 3vw, 1.75rem);
+        margin-bottom: 24px;
+        color: var(--color-text);
+        font-weight: 600;
+      }
+      .draw-screen__canvas-wrapper {
+        position: relative;
+        background: #ffffff;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        margin: 0 auto 20px;
+        max-width: 800px;
+      }
+      #draw-canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: var(--radius-lg);
+        cursor: crosshair;
+      }
+      .draw-screen__tools {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 16px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--color-border);
+      }
+      .tool {
+        padding: 10px 16px;
+        border-radius: var(--radius-md);
+        background: var(--color-bg-soft);
+        border: 2px solid var(--color-border);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .tool:hover {
+        background: var(--color-surface-hover);
+      }
+      .tool--active {
+        border-color: var(--color-primary);
+        background: rgba(108, 99, 255, 0.15);
+        color: var(--color-primary);
+      }
+      .tool-colors {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .tool-color {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: all var(--transition-fast);
+      }
+      .tool-color:hover {
+        transform: scale(1.1);
+      }
+      .tool-color--active {
+        border-color: #ffffff;
+        box-shadow: 0 0 0 2px var(--color-primary);
+      }
+      .tool-sizes {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .tool-size {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 2px solid var(--color-border);
+        background: var(--color-bg-soft);
+        transition: all var(--transition-fast);
+      }
+      .tool-size:hover {
+        background: var(--color-surface-hover);
+      }
+      .tool-size--active {
+        border-color: var(--color-primary);
+        background: rgba(108, 99, 255, 0.15);
+      }
+      .tool-size__dot {
+        border-radius: 50%;
+        background: var(--color-text);
+      }
+
+      /* Écran d'attente */
+      .waiting-screen {
+        max-width: 600px;
+        margin: 80px auto;
+        text-align: center;
+      }
+      .waiting-screen__title {
+        font-size: clamp(1.5rem, 4vw, 2rem);
+        margin-bottom: 24px;
+      }
+      .waiting-screen__spinner {
+        width: 64px;
+        height: 64px;
+        border: 4px solid var(--color-surface);
+        border-top-color: var(--color-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 32px auto;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      .waiting-screen__players {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 32px;
+      }
+      .waiting-player {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: var(--color-surface);
+        border-radius: var(--radius-md);
+      }
+      .waiting-player__avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: var(--color-bg-soft);
+      }
+      .waiting-player__name {
+        flex: 1;
+        text-align: left;
+        font-weight: 600;
+      }
+      .waiting-player__status {
+        font-size: 20px;
+      }
+
+      /* Actions */
+      .game__actions {
+        text-align: center;
+        margin-top: 24px;
+      }
+
+      /* Révélation finale */
+      .reveal {
+        max-width: 900px;
+        margin: 0 auto;
+        text-align: center;
+      }
+      .reveal__title {
+        font-size: clamp(1.75rem, 5vw, 2.5rem);
+        margin-bottom: 12px;
+      }
+      .reveal__subtitle {
+        color: var(--color-text-soft);
+        margin-bottom: 40px;
+      }
+      .reveal__chains {
+        display: flex;
+        flex-direction: column;
+        gap: 48px;
+      }
+      .reveal-chain {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        text-align: left;
+      }
+      .reveal-chain__title {
+        font-size: 1.25rem;
+        margin-bottom: 20px;
+        color: var(--color-primary);
+      }
+      .reveal-chain__steps {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .reveal-step {
+        padding: 16px;
+        background: var(--color-bg-soft);
+        border-radius: var(--radius-md);
+        border-left: 3px solid var(--color-primary);
+      }
+      .reveal-step__author {
+        font-size: 13px;
+        color: var(--color-text-muted);
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+      .reveal-step__text {
+        font-size: 1.1rem;
+        font-style: italic;
+      }
+      .reveal-step__img {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: var(--radius-sm);
+        display: block;
+      }
+
+      @media (max-width: 768px) {
+        .game__content {
+          padding: 12px;
+        }
+        .draw-screen__tools {
+          gap: 8px;
+          padding: 12px;
+        }
+        .tool-colors {
+          gap: 6px;
+        }
+        .tool-color {
+          width: 32px;
+          height: 32px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game" id="game">
+      <!-- Timer -->
+      <div class="game__timer" id="timer" style="display: none">
+        <div class="timer__label" id="timer-label">Tour 1/8</div>
+        <div class="timer__bar">
+          <div class="timer__fill" id="timer-fill"></div>
+        </div>
+        <div class="timer__count">
+          <span id="timer-time">30</span>s
+        </div>
+      </div>
+
+      <!-- Contenu -->
+      <div class="game__content">
+        <!-- Écran d'écriture -->
+        <div class="game__screen game__screen--active" id="screen-write">
+          <div class="write-screen">
+            <p class="write-screen__prompt" id="write-prompt">
+              Écris une phrase que les autres devront dessiner !
+            </p>
+            <div class="write-screen__context" id="write-context"></div>
+            <div class="write-screen__input">
+              <textarea
+                id="write-input"
+                placeholder="Ex: Un chat qui joue de la guitare sur la lune"
+                maxlength="150"
+              ></textarea>
+            </div>
+            <div class="write-screen__counter">
+              <span id="write-counter">0</span>/150 caractères
+            </div>
+            <div class="game__actions">
+              <button type="button" class="btn btn--primary" id="btn-submit-write">
+                Terminé
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Écran de dessin -->
+        <div class="game__screen" id="screen-draw">
+          <div class="draw-screen">
+            <p class="draw-screen__prompt" id="draw-prompt">
+              Dessine cette phrase !
+            </p>
+            <div class="draw-screen__canvas-wrapper">
+              <canvas id="draw-canvas" width="800" height="600"></canvas>
+            </div>
+            <div class="draw-screen__tools">
+              <div class="tool-sizes">
+                <button class="tool-size tool-size--active" data-size="2" title="Fin">
+                  <div class="tool-size__dot" style="width: 4px; height: 4px"></div>
+                </button>
+                <button class="tool-size" data-size="6" title="Moyen">
+                  <div class="tool-size__dot" style="width: 8px; height: 8px"></div>
+                </button>
+                <button class="tool-size" data-size="14" title="Épais">
+                  <div class="tool-size__dot" style="width: 14px; height: 14px"></div>
+                </button>
+              </div>
+              <div class="tool-colors" id="color-palette"></div>
+              <button class="tool" id="tool-eraser">🧹 Gomme</button>
+              <button class="tool" id="tool-undo">↶ Annuler</button>
+              <button class="tool" id="tool-clear">🗑️ Tout effacer</button>
+            </div>
+            <div class="game__actions">
+              <button type="button" class="btn btn--primary" id="btn-submit-draw">
+                Terminé
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Écran d'attente -->
+        <div class="game__screen" id="screen-waiting">
+          <div class="waiting-screen">
+            <h2 class="waiting-screen__title">En attente des autres joueurs...</h2>
+            <div class="waiting-screen__spinner"></div>
+            <div class="waiting-screen__players" id="waiting-players"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/sounds.js"></script>
+    <script src="/js/avatars.js"></script>
+    <script src="/js/canvas.js"></script>
+    <script src="/js/game.js"></script>
+  </body>
+</html>

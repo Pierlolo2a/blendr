@@ -1,0 +1,472 @@
+/* ==========================================================================
+   Blendr — Styles globaux
+   ========================================================================== */
+
+:root {
+  /* Couleurs — identité visuelle */
+  --color-bg: #1a1a2e;
+  --color-bg-soft: #22223a;
+  --color-bg-elev: #2a2a44;
+  --color-surface: rgba(255, 255, 255, 0.04);
+  --color-surface-hover: rgba(255, 255, 255, 0.08);
+  --color-border: rgba(255, 255, 255, 0.1);
+
+  --color-text: #ffffff;
+  --color-text-soft: rgba(255, 255, 255, 0.72);
+  --color-text-muted: rgba(255, 255, 255, 0.45);
+
+  --color-primary: #6c63ff; /* violet */
+  --color-primary-hover: #8079ff;
+  --color-secondary: #ff6b6b; /* corail */
+  --color-secondary-hover: #ff8585;
+  --color-accent: #ffd93d; /* jaune */
+  --color-danger: #ff4b5c;
+  --color-success: #4ade80;
+
+  /* Typographie */
+  --font-sans:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+  --font-display: var(--font-sans);
+
+  /* Rayons, espacements */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.4);
+  --shadow-glow-primary: 0 0 0 4px rgba(108, 99, 255, 0.15);
+  --shadow-glow-secondary: 0 0 0 4px rgba(255, 107, 107, 0.15);
+
+  --transition-fast: 120ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-med: 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ==========================================================================
+   Reset minimal
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  background-image:
+    radial-gradient(
+      ellipse at top left,
+      rgba(108, 99, 255, 0.12),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse at bottom right,
+      rgba(255, 107, 107, 0.1),
+      transparent 55%
+    );
+  background-attachment: fixed;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--color-text);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ==========================================================================
+   Focus visible accessible
+   ========================================================================== */
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Page d'accueil
+   ========================================================================== */
+
+.home {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.home__header {
+  text-align: center;
+  margin: 24px 0 40px;
+}
+
+.home__tagline {
+  margin-top: 12px;
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--color-text-soft);
+  letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   Cartes principales (Créer / Rejoindre)
+   ========================================================================== */
+
+.home__cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 820px;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  backdrop-filter: blur(8px);
+  transition:
+    transform var(--transition-med),
+    border-color var(--transition-med),
+    box-shadow var(--transition-med);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.card--create:hover {
+  border-color: rgba(108, 99, 255, 0.5);
+}
+
+.card--join:hover {
+  border-color: rgba(255, 107, 107, 0.5);
+}
+
+.card--highlighted {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.3);
+}
+
+.card__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* ==========================================================================
+   Champs de formulaire
+   ========================================================================== */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__label {
+  font-size: 13px;
+  color: var(--color-text-soft);
+  font-weight: 500;
+}
+
+.field__input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: 15px;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.field__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.field__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-glow-primary);
+  background: var(--color-bg-elev);
+}
+
+.field__input--code {
+  font-family: 'Menlo', 'Consolas', monospace;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.field__error {
+  min-height: 18px;
+  font-size: 13px;
+  color: var(--color-danger);
+}
+
+/* ==========================================================================
+   Boutons
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+  transition:
+    transform var(--transition-fast),
+    filter var(--transition-fast),
+    box-shadow var(--transition-med);
+  min-height: 48px;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  box-shadow: 0 6px 18px rgba(108, 99, 255, 0.4);
+}
+
+.btn--primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.btn--secondary {
+  background: var(--color-secondary);
+  box-shadow: 0 6px 18px rgba(255, 107, 107, 0.4);
+}
+
+.btn--secondary:hover {
+  background: var(--color-secondary-hover);
+}
+
+.btn--accent {
+  background: var(--color-accent);
+  color: #1a1a2e;
+}
+
+.btn--ghost {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.btn--ghost:hover {
+  background: var(--color-surface-hover);
+}
+
+/* ==========================================================================
+   Avatar picker
+   ========================================================================== */
+
+.avatar-picker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 auto;
+}
+
+.avatar-picker__avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--color-bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--color-border);
+}
+
+.avatar-picker__avatar svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.avatar-picker__shuffle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.avatar-picker__shuffle:hover {
+  background: var(--color-surface-hover);
+  transform: rotate(-20deg) scale(1.05);
+}
+
+/* ==========================================================================
+   Footer page d'accueil
+   ========================================================================== */
+
+.home__footer {
+  margin-top: auto;
+  padding-top: 48px;
+  text-align: center;
+}
+
+.home__links {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.home__link {
+  color: var(--color-text-soft);
+  font-size: 14px;
+  transition: color var(--transition-fast);
+  cursor: pointer;
+}
+
+.home__link:hover {
+  color: var(--color-text);
+}
+
+.home__link--toggle .sound-off {
+  display: none;
+}
+
+.home__link--toggle[aria-pressed='false'] .sound-on {
+  display: none;
+}
+
+.home__link--toggle[aria-pressed='false'] .sound-off {
+  display: inline;
+}
+
+.home__credits {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.home__credits a {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ==========================================================================
+   Toast / notifications
+   ========================================================================== */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--color-bg-elev);
+  color: var(--color-text);
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--transition-med),
+    transform var(--transition-med);
+  z-index: 1000;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast--error {
+  border-color: var(--color-danger);
+}
+
+.toast--success {
+  border-color: var(--color-success);
+}

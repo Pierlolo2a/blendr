@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Blendr - Draw. Guess. Lose the plot. Un jeu web multijoueur en temps réel inspiré du téléphone arabe."
+    />
+    <title>Blendr — Draw. Guess. Lose the plot.</title>
+
+    <link rel="icon" type="image/jpeg" href="/assets/img/logo.jpg" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/wordmark.css" />
+    <link rel="stylesheet" href="/css/animations.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <main class="home">
+      <!-- Logo -->
+      <header class="home__header">
+        <h1 class="wordmark">
+          <span class="wordmark__spark wordmark__spark--1" aria-hidden="true"></span>
+          <span class="wordmark__spark wordmark__spark--2" aria-hidden="true"></span>
+          <span class="wordmark__spark wordmark__spark--3" aria-hidden="true"></span>
+          <span class="wordmark__letters">
+            <span class="wordmark__letter" style="--i: 0">B</span>
+            <span class="wordmark__letter" style="--i: 1">l</span>
+            <span class="wordmark__letter" style="--i: 2">e</span>
+            <span class="wordmark__letter" style="--i: 3">n</span>
+            <span class="wordmark__letter" style="--i: 4">d</span>
+            <span class="wordmark__letter" style="--i: 5">r</span>
+          </span>
+          <span class="wordmark__accent" aria-hidden="true"></span>
+        </h1>
+        <p class="home__tagline anim-fade-in-delayed">
+          Draw. Guess. Lose the plot.
+        </p>
+      </header>
+
+      <!-- Blocs principaux -->
+      <section class="home__cards anim-fade-in-delayed-2">
+        <!-- Créer une partie -->
+        <article class="card card--create" data-card="create">
+          <h2 class="card__title">Créer une partie</h2>
+
+          <div class="avatar-picker">
+            <div class="avatar-picker__avatar" id="avatar-create"></div>
+            <button
+              type="button"
+              class="avatar-picker__shuffle"
+              id="avatar-create-shuffle"
+              aria-label="Changer d'avatar"
+              title="Changer d'avatar"
+            >
+              🎲
+            </button>
+          </div>
+
+          <label class="field">
+            <span class="field__label">Ton pseudo</span>
+            <input
+              type="text"
+              class="field__input"
+              id="pseudo-create"
+              placeholder="Ex: Bastien_42"
+              maxlength="16"
+              autocomplete="off"
+            />
+            <span class="field__error" id="error-create"></span>
+          </label>
+
+          <button type="button" class="btn btn--primary" id="btn-create">
+            Créer
+          </button>
+        </article>
+
+        <!-- Rejoindre une partie -->
+        <article class="card card--join" data-card="join">
+          <h2 class="card__title">Rejoindre une partie</h2>
+
+          <div class="avatar-picker">
+            <div class="avatar-picker__avatar" id="avatar-join"></div>
+            <button
+              type="button"
+              class="avatar-picker__shuffle"
+              id="avatar-join-shuffle"
+              aria-label="Changer d'avatar"
+              title="Changer d'avatar"
+            >
+              🎲
+            </button>
+          </div>
+
+          <label class="field">
+            <span class="field__label">Ton pseudo</span>
+            <input
+              type="text"
+              class="field__input"
+              id="pseudo-join"
+              placeholder="Ex: Clara_K"
+              maxlength="16"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="field">
+            <span class="field__label">Code d'invitation</span>
+            <input
+              type="text"
+              class="field__input field__input--code"
+              id="code-join"
+              placeholder="XKF92"
+              maxlength="5"
+              autocomplete="off"
+            />
+            <span class="field__error" id="error-join"></span>
+          </label>
+
+          <button type="button" class="btn btn--secondary" id="btn-join">
+            Rejoindre
+          </button>
+        </article>
+      </section>
+
+      <!-- Liens du pied de page -->
+      <footer class="home__footer anim-fade-in-delayed-3">
+        <nav class="home__links">
+          <a href="/howtoplay" class="home__link">Comment jouer</a>
+          <a href="#" class="home__link" id="link-history">
+            Historique de mes parties
+          </a>
+          <button
+            type="button"
+            class="home__link home__link--toggle"
+            id="toggle-sound"
+            aria-pressed="true"
+            title="Couper/activer les sons"
+          >
+            <span class="sound-on">🔊 Son</span>
+            <span class="sound-off">🔇 Son</span>
+          </button>
+        </nav>
+
+        <p class="home__credits">
+          Made with chaos ·
+          <a href="#" target="_blank" rel="noopener">GitHub</a>
+        </p>
+      </footer>
+    </main>
+
+    <!-- Toast / messages -->
+    <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/sounds.js"></script>
+    <script src="/js/avatars.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>
