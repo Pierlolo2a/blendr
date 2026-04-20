@@ -34,6 +34,7 @@
 
     socket.on('connect', () => {
       console.log('[socket] Connecté', socket.id);
+      // Important : synchronise mySocketId immédiatement
       mySocketId = socket.id;
 
       // Rejoindre la room avec les infos stockées localement
@@ -55,10 +56,12 @@
             setTimeout(() => (window.location.href = '/'), 1500);
             return;
           }
+          // Met à jour mySocketId au cas où il aurait changé pendant l'appel
           mySocketId = socket.id;
           roomData = res.room;
+          // Force un re-render pour mettre à jour l'UI hôte/joueur
           renderRoom();
-          console.log('[lobby] rejoin OK', res.code);
+          console.log('[lobby] rejoin OK', res.code, 'hostId:', roomData?.hostId, 'myId:', mySocketId);
         }
       );
     });
@@ -74,6 +77,10 @@
     socket.on('room:update', (data) => {
       console.log('[room:update]', data);
       roomData = data;
+      // Synchronise mySocketId au cas où le socket se reconnecte
+      if (socket.id) {
+        mySocketId = socket.id;
+      }
       renderRoom();
     });
 
