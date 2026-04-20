@@ -14,6 +14,7 @@
   let socket = null;
   let roomData = null;
   let mySocketId = null;
+  let myPlayerId = null; // ID stable de mon joueur dans la room (peut différer de socket.id après reconnexion)
 
   // Récupération du code depuis l'URL
   const params = new URLSearchParams(window.location.search);
@@ -56,12 +57,11 @@
             setTimeout(() => (window.location.href = '/'), 1500);
             return;
           }
-          // Met à jour mySocketId au cas où il aurait changé pendant l'appel
           mySocketId = socket.id;
+          myPlayerId = socket.id; // Ancre mon identité au moment de la confirmation serveur
           roomData = res.room;
-          // Force un re-render pour mettre à jour l'UI hôte/joueur
           renderRoom();
-          console.log('[lobby] rejoin OK', res.code, 'hostId:', roomData?.hostId, 'myId:', mySocketId);
+          console.log('[lobby] rejoin OK', res.code, 'hostId:', roomData?.hostId, 'myPlayerId:', myPlayerId, 'isHost:', roomData?.hostId === myPlayerId);
         }
       );
     });
@@ -75,12 +75,23 @@
     });
 
     socket.on('room:update', (data) => {
-      console.log('[room:update]', data);
       roomData = data;
-      // Synchronise mySocketId au cas où le socket se reconnecte
-      if (socket.id) {
-        mySocketId = socket.id;
+      if (socket.id) mySocketId = socket.id;
+
+      // Si myPlayerId est connu, vérifie qu'il est encore dans la room.
+      // Si mon socket.id a changé (reconnexion), cherche mon joueur par pseudo et re-ancre myPlayerId.
+      if (myPlayerId) {
+        const stillThere = data.players?.find((p) => p.id === myPlayerId);
+        if (!stillThere) {
+          const myPseudo = utils.storage.get('blendr.pseudo');
+          const byPseudo = data.players?.find((p) => p.pseudo === myPseudo);
+          if (byPseudo) {
+            console.log('[room:update] myPlayerId mis à jour:', myPlayerId, '->', byPseudo.id);
+            myPlayerId = byPseudo.id;
+          }
+        }
       }
+
       renderRoom();
     });
 
@@ -167,21 +178,23 @@
   function renderRoom() {
     if (!roomData) return;
 
-    // Détection robuste de l'hôte : on cherche NOTRE joueur par socket.id,
-    // avec fallback par pseudo si le socket.id a changé (reconnexion)
-    const currentSocketId = socket?.id || mySocketId;
-    const myPseudo = utils.storage.get('blendr.pseudo');
+    // Source de vérité : myPlayerId ancré au moment du rejoin ack.
+    // Si absent (page chargée sans ack encore), fallback sur socket.id puis pseudo.
     const players = roomData.players || [];
+    const myPseudo = utils.storage.get('blendr.pseudo');
+    const lookupId = myPlayerId || socket?.id || mySocketId;
     const myPlayer =
-      players.find((p) => p.id === currentSocketId) ||
+      players.find((p) => p.id === lookupId) ||
       players.find((p) => p.pseudo === myPseudo);
+
+    // isHost = mon joueur a isHost:true OU hostId pointe vers mon joueur
     const isHost =
-      (myPlayer?.isHost === true) ||
-      (roomData.hostId === currentSocketId) ||
-      (roomData.hostId === myPlayer?.id);
+      myPlayer?.isHost === true ||
+      roomData.hostId === myPlayer?.id;
+
     const settings = roomData.settings || {};
 
-    console.log('[renderRoom] isHost:', isHost, 'myId:', currentSocketId, 'hostId:', roomData.hostId, 'myPlayer:', myPlayer?.pseudo, 'myPseudo:', myPseudo);
+    console.log('[renderRoom] isHost:', isHost, 'myPlayerId:', myPlayerId, 'hostId:', roomData.hostId, 'myPlayer.id:', myPlayer?.id, 'myPlayer.isHost:', myPlayer?.isHost);
 
     // Compteur de joueurs
     document.getElementById('player-count').textContent = players.length;
