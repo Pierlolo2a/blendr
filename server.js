@@ -308,6 +308,19 @@ function generateRoomCode() {
 }
 
 function serializeRoom(room) {
+  // Normalise la coherence hostId <-> player.isHost avant de serialiser
+  // Cas 1 : hostId ne correspond a aucun joueur => on promeut le premier joueur
+  if (room.players.size > 0 && !room.players.has(room.hostId)) {
+    const first = [...room.players.values()].find((p) => p.connected) || [...room.players.values()][0];
+    if (first) {
+      room.hostId = first.id;
+      log.warn(`[room] hostId orphelin dans ${room.code}, promotion de ${first.pseudo}`);
+    }
+  }
+  // Cas 2 : s'assure qu'un seul joueur a isHost=true et que c'est bien room.hostId
+  for (const p of room.players.values()) {
+    p.isHost = (p.id === room.hostId);
+  }
   return {
     code: room.code,
     hostId: room.hostId,

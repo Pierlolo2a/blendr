@@ -167,16 +167,21 @@
   function renderRoom() {
     if (!roomData) return;
 
-    // Détection robuste de l'hôte : on cherche NOTRE entrée dans la liste
-    // et on vérifie son flag isHost (plus fiable que comparer hostId === mySocketId
-    // car socket.id peut changer après reconnexion)
+    // Détection robuste de l'hôte : on cherche NOTRE joueur par socket.id,
+    // avec fallback par pseudo si le socket.id a changé (reconnexion)
     const currentSocketId = socket?.id || mySocketId;
+    const myPseudo = utils.storage.get('blendr.pseudo');
     const players = roomData.players || [];
-    const myPlayer = players.find((p) => p.id === currentSocketId);
-    const isHost = myPlayer?.isHost === true || roomData.hostId === currentSocketId;
+    const myPlayer =
+      players.find((p) => p.id === currentSocketId) ||
+      players.find((p) => p.pseudo === myPseudo);
+    const isHost =
+      (myPlayer?.isHost === true) ||
+      (roomData.hostId === currentSocketId) ||
+      (roomData.hostId === myPlayer?.id);
     const settings = roomData.settings || {};
 
-    console.log('[renderRoom] isHost:', isHost, 'myId:', currentSocketId, 'hostId:', roomData.hostId, 'myPlayer:', myPlayer);
+    console.log('[renderRoom] isHost:', isHost, 'myId:', currentSocketId, 'hostId:', roomData.hostId, 'myPlayer:', myPlayer?.pseudo, 'myPseudo:', myPseudo);
 
     // Compteur de joueurs
     document.getElementById('player-count').textContent = players.length;
