@@ -684,6 +684,7 @@ io.on('connection', (socket) => {
         setTimeout(() => {
           room.state = 'playing';
           initializeGame(room);
+          io.to(room.code).emit('game:start', {});
           log.info(`[game] demarrage ${room.code}`);
         }, 1000);
       }
